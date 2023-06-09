@@ -16,21 +16,27 @@ namespace TheWillStock
         public void ConfigureServices(IServiceCollection services)
         {
 
-          services.AddDbContext<DataContext>(options =>
-          options.UseMySql(Configuration.GetConnectionString("DataContext"),
-          ServerVersion.AutoDetect(Configuration.GetConnectionString("DataContext")), builder => builder.MigrationsAssembly("TheWillStock")));
+            services.AddDbContext<DataContext>(options =>
+            options.UseMySql(Configuration.GetConnectionString("DataContext"),
+             ServerVersion.AutoDetect(Configuration.GetConnectionString("DataContext")), builder => builder.MigrationsAssembly("TheWillStock")));
 
-      //services.AddDbContext<DataContext>(options =>
-      //      options.UseMySql(Configuration.GetConnectionString("DataContext"),
-      //      ServerVersion.AutoDetect(Configuration.GetConnectionString("DataContext"))));
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                });
+            });
 
 
-      services.AddControllers();
+            services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Configuração da pipeline de requisição da aplicação
+            app.UseCors();
         }
    }
 }

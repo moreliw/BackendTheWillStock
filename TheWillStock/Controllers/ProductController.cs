@@ -1,21 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TheWillStock.Data;
 using TheWillStock.Models;
 
 namespace TheWillStock.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : Controller
+    public class ProductController : ControllerBase
     {
-        public IActionResult Index()
-        {
-            List<ProductModel> products = new List<ProductModel>();
-            products.Add(new ProductModel { Id = 1, Nome = "Produto 1", Preco = 10.99 });
-            products.Add(new ProductModel { Id = 2, Nome = "Produto 2", Preco = 5.99 });
-            products.Add(new ProductModel { Id = 3, Nome = "Produto 3", Preco = 7.99 });
+        private readonly DataContext _context;
 
-            return View(products);
+        public ProductController(DataContext context)
+        {
+            _context = context;
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProductModel>>> GetProducts()
+        {
+            return await _context.ProductModel.ToListAsync();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ProductModel>> CreateProduct(ProductModel product)
+        {
+            _context.ProductModel.Add(product);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(ProductModel), new { id = product.Id }, product);
+        }
+
     }
 }
